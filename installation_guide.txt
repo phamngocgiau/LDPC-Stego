@@ -1,0 +1,500 @@
+# Installation Guide
+
+Complete installation guide for the LDPC Steganography System.
+
+## Table of Contents
+
+1. [System Requirements](#system-requirements)
+2. [Quick Installation](#quick-installation)
+3. [Detailed Installation](#detailed-installation)
+4. [LDPC Library Setup](#ldpc-library-setup)
+5. [GPU Support](#gpu-support)
+6. [Development Setup](#development-setup)
+7. [Docker Installation](#docker-installation)
+8. [Troubleshooting](#troubleshooting)
+
+## System Requirements
+
+### Minimum Requirements
+- **OS**: Linux (Ubuntu 18.04+), macOS (10.14+), Windows 10
+- **Python**: 3.8 or higher
+- **RAM**: 8 GB minimum, 16 GB recommended
+- **Storage**: 5 GB free space
+- **CPU**: Intel i5 or AMD Ryzen 5 equivalent
+
+### Recommended Requirements
+- **OS**: Linux (Ubuntu 20.04+)
+- **Python**: 3.9 or 3.10
+- **RAM**: 32 GB or higher
+- **Storage**: 50 GB free space (for datasets)
+- **GPU**: NVIDIA GPU with 8GB+ VRAM (RTX 3070, RTX 4070, V100, etc.)
+- **CUDA**: 11.0 or higher
+
+## Quick Installation
+
+For most users, the quick installation should work:
+
+```bash
+# 1. Clone the repository
+git clone https://github.com/your-username/ldpc-steganography.git
+cd ldpc-steganography
+
+# 2. Create virtual environment
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+
+# 3. Install dependencies
+pip install -r requirements_ldpc.txt
+
+# 4. Verify installation
+python -c "import torch; from core.adaptive_ldpc import create_ldpc_system; print('✅ Installation successful!')"
+```
+
+## Detailed Installation
+
+### Step 1: Clone Repository
+
+```bash
+# Clone with all submodules
+git clone --recursive https://github.com/your-username/ldpc-steganography.git
+cd ldpc-steganography
+
+# Or clone and initialize submodules separately
+git clone https://github.com/your-username/ldpc-steganography.git
+cd ldpc-steganography
+git submodule update --init --recursive
+```
+
+### Step 2: Python Environment Setup
+
+#### Option A: Using venv (Recommended)
+
+```bash
+# Create virtual environment
+python -m venv venv
+
+# Activate environment
+# On Linux/macOS:
+source venv/bin/activate
+# On Windows:
+venv\Scripts\activate
+
+# Upgrade pip
+pip install --upgrade pip
+```
+
+#### Option B: Using conda
+
+```bash
+# Create conda environment
+conda create -n ldpc-stego python=3.9
+conda activate ldpc-stego
+
+# Install pip in conda environment
+conda install pip
+```
+
+#### Option C: Using pyenv (Advanced)
+
+```bash
+# Install specific Python version
+pyenv install 3.9.16
+pyenv local 3.9.16
+
+# Create virtual environment
+python -m venv venv
+source venv/bin/activate
+```
+
+### Step 3: Install Dependencies
+
+#### Basic Installation
+
+```bash
+# Install basic requirements
+pip install -r requirements.txt
+```
+
+#### LDPC-Enhanced Installation
+
+```bash
+# Install with LDPC support
+pip install -r requirements_ldpc.txt
+```
+
+#### Development Installation
+
+```bash
+# Install development dependencies
+pip install -r requirements_dev.txt
+
+# Install in editable mode
+pip install -e .
+```
+
+### Step 4: Verify Installation
+
+```bash
+# Run basic tests
+python -c "
+import torch
+import numpy as np
+from configs.ldpc_config import LDPCConfig
+from core.adaptive_ldpc import create_ldpc_system
+
+print('PyTorch version:', torch.__version__)
+print('CUDA available:', torch.cuda.is_available())
+
+config = LDPCConfig()
+ldpc_system = create_ldpc_system(config)
+print('✅ LDPC system created successfully!')
+"
+```
+
+## LDPC Library Setup
+
+The system uses the `ldpc` Python library for high-performance LDPC operations.
+
+### Automatic Installation
+
+```bash
+pip install ldpc>=0.1.54
+```
+
+### Manual Installation (if automatic fails)
+
+```bash
+# Install dependencies
+pip install numpy cython
+
+# Install from source
+pip install git+https://github.com/hichamjanati/ldpc.git
+```
+
+### Alternative: Build from Source
+
+```bash
+# Clone LDPC library
+git clone https://github.com/hichamjanati/ldpc.git
+cd ldpc
+
+# Build and install
+python setup.py build_ext --inplace
+pip install .
+cd ..
+```
+
+### Verify LDPC Installation
+
+```bash
+python -c "
+import ldpc
+print('LDPC library version:', ldpc.__version__)
+print('✅ LDPC library installed successfully!')
+"
+```
+
+## GPU Support
+
+### CUDA Installation
+
+#### Check CUDA Compatibility
+
+```bash
+# Check if CUDA is available
+nvidia-smi
+
+# Check CUDA version
+nvcc --version
+```
+
+#### Install CUDA Toolkit (if needed)
+
+```bash
+# Ubuntu/Debian
+wget https://developer.download.nvidia.com/compute/cuda/11.8.0/local_installers/cuda_11.8.0_520.61.05_linux.run
+sudo sh cuda_11.8.0_520.61.05_linux.run
+
+# Add to PATH
+echo 'export PATH=/usr/local/cuda/bin:$PATH' >> ~/.bashrc
+echo 'export LD_LIBRARY_PATH=/usr/local/cuda/lib64:$LD_LIBRARY_PATH' >> ~/.bashrc
+source ~/.bashrc
+```
+
+### PyTorch with CUDA
+
+```bash
+# Install PyTorch with CUDA support
+pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
+
+# Verify CUDA support
+python -c "
+import torch
+print('CUDA available:', torch.cuda.is_available())
+print('CUDA version:', torch.version.cuda)
+print('GPU count:', torch.cuda.device_count())
+if torch.cuda.is_available():
+    print('GPU name:', torch.cuda.get_device_name(0))
+"
+```
+
+### ROCm Support (AMD GPUs)
+
+```bash
+# Install PyTorch with ROCm support
+pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/rocm5.4.2
+```
+
+## Development Setup
+
+### Pre-commit Hooks
+
+```bash
+# Install pre-commit
+pip install pre-commit
+
+# Install hooks
+pre-commit install
+
+# Run on all files (optional)
+pre-commit run --all-files
+```
+
+### Code Quality Tools
+
+```bash
+# Code formatting
+pip install black isort
+
+# Type checking
+pip install mypy
+
+# Linting
+pip install flake8 pylint
+
+# Testing
+pip install pytest pytest-cov
+```
+
+### Documentation Setup
+
+```bash
+# Install documentation dependencies
+pip install sphinx sphinx-rtd-theme
+
+# Build documentation
+cd docs
+make html
+```
+
+## Docker Installation
+
+### Using Pre-built Image
+
+```bash
+# Pull the Docker image
+docker pull ldpc-steganography:latest
+
+# Run container
+docker run -it --gpus all -v $(pwd):/workspace ldpc-steganography:latest
+```
+
+### Build from Dockerfile
+
+```bash
+# Build Docker image
+docker build -t ldpc-steganography:latest .
+
+# Run with GPU support
+docker run -it --gpus all -v $(pwd):/workspace ldpc-steganography:latest
+
+# Run CPU-only
+docker run -it -v $(pwd):/workspace ldpc-steganography:latest
+```
+
+### Docker Compose
+
+```bash
+# Using docker-compose
+docker-compose up -d
+
+# Access Jupyter notebook
+open http://localhost:8888
+```
+
+## Platform-Specific Instructions
+
+### Ubuntu/Debian
+
+```bash
+# Install system dependencies
+sudo apt update
+sudo apt install -y python3-dev python3-pip python3-venv
+sudo apt install -y build-essential cmake
+sudo apt install -y libopencv-dev
+
+# Install Python dependencies
+pip install -r requirements_ldpc.txt
+```
+
+### CentOS/RHEL
+
+```bash
+# Install system dependencies
+sudo yum groupinstall -y "Development Tools"
+sudo yum install -y python3-devel python3-pip
+sudo yum install -y cmake opencv-devel
+
+# Install Python dependencies
+pip3 install -r requirements_ldpc.txt
+```
+
+### macOS
+
+```bash
+# Install Homebrew (if not installed)
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+# Install dependencies
+brew install python@3.9 cmake opencv
+
+# Install Python dependencies
+pip3 install -r requirements_ldpc.txt
+```
+
+### Windows
+
+```powershell
+# Install Visual Studio Build Tools
+# Download from: https://visualstudio.microsoft.com/downloads/#build-tools-for-visual-studio-2022
+
+# Install Python dependencies
+pip install -r requirements_ldpc.txt
+```
+
+## Troubleshooting
+
+### Common Issues and Solutions
+
+#### 1. LDPC Library Installation Fails
+
+```bash
+# Error: Microsoft Visual C++ 14.0 is required (Windows)
+# Solution: Install Visual Studio Build Tools
+
+# Error: gcc not found (Linux)
+sudo apt install build-essential
+
+# Error: Cannot find CUDA (if using GPU)
+# Solution: Install CUDA toolkit or use CPU version
+pip install ldpc --no-binary ldpc
+```
+
+#### 2. PyTorch Installation Issues
+
+```bash
+# Clear pip cache
+pip cache purge
+
+# Install specific version
+pip install torch==1.13.1 torchvision==0.14.1 --index-url https://download.pytorch.org/whl/cu117
+
+# For CPU-only installation
+pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu
+```
+
+#### 3. Memory Issues
+
+```bash
+# Reduce batch size in config
+export BATCH_SIZE=2
+
+# Use mixed precision
+export MIXED_PRECISION=true
+
+# Limit PyTorch threads
+export OMP_NUM_THREADS=4
+```
+
+#### 4. Permission Issues (Linux/macOS)
+
+```bash
+# Fix pip permissions
+pip install --user -r requirements_ldpc.txt
+
+# Or use virtual environment
+python -m venv venv
+source venv/bin/activate
+pip install -r requirements_ldpc.txt
+```
+
+### Verification Commands
+
+```bash
+# Test basic functionality
+python tests/test_ldpc.py
+
+# Test GPU functionality
+python -c "
+import torch
+from models.steganography_model import AdvancedSteganographyModelWithLDPC
+from configs.ldpc_config import LDPCConfig
+from core.adaptive_ldpc import create_ldpc_system
+
+device = 'cuda' if torch.cuda.is_available() else 'cpu'
+config = LDPCConfig()
+config.device = device
+
+ldpc_system = create_ldpc_system(config)
+model = AdvancedSteganographyModelWithLDPC(config, ldpc_system).to(device)
+
+print(f'✅ Model created on {device}')
+"
+
+# Test complete pipeline
+python experiments/test_ldpc.py --quick-test
+```
+
+### Getting Help
+
+If you encounter issues not covered here:
+
+1. **Check Issues**: Search [GitHub Issues](https://github.com/your-username/ldpc-steganography/issues)
+2. **Create Issue**: Open a new issue with:
+   - OS and Python version
+   - Full error message
+   - Installation commands used
+   - Output of `pip list`
+3. **Discord/Slack**: Join our community for real-time help
+4. **Email**: Contact us at ldpc.steganography@example.com
+
+### Minimum Working Example
+
+After installation, test with this minimal example:
+
+```python
+import torch
+from configs.ldpc_config import LDPCConfig
+from core.adaptive_ldpc import create_ldpc_system
+
+# Create configuration
+config = LDPCConfig()
+config.message_length = 256
+config.device = 'cpu'  # Change to 'cuda' if available
+
+# Create LDPC system
+ldpc_system = create_ldpc_system(config)
+
+# Test encoding/decoding
+message = torch.randint(0, 2, (1, 256), dtype=torch.float32)
+encoded = ldpc_system.encode(message, attack_strength=0.3)
+decoded = ldpc_system.decode(encoded, attack_strength=0.3)
+
+# Check accuracy
+accuracy = (decoded > 0.5) == (message > 0.5)
+print(f"✅ LDPC test successful! Accuracy: {accuracy.float().mean():.1%}")
+```
+
+---
+
+**Next Steps**: After successful installation, see [EXAMPLES.md](EXAMPLES.md) for usage examples or jump into the [Jupyter notebooks](../notebooks/) for interactive tutorials.
